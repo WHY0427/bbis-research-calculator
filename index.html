@@ -1,0 +1,751 @@
+<!doctype html>
+<!-- Self-contained BBIS Research Calculator · Model BBIS-UKB-1.0 -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Standalone calculator for the UK Biobank-derived blood-based inflammatory score.">
+  <title>BBIS Research Calculator</title>
+  <style>
+    :root {
+      --primary: #244f70;
+      --primary-dark: #173c56;
+      --primary-light: #edf4f8;
+      --accent: #4b9e93;
+      --accent-light: #eef8f5;
+      --ink: #243746;
+      --muted: #6d7d89;
+      --line: #d9e2e7;
+      --background: #f3f6f7;
+      --surface: #ffffff;
+      --danger: #b84e42;
+      --warning-bg: #fff8e9;
+      --warning-line: #e9c985;
+      font-family: Arial, Helvetica, sans-serif;
+      color-scheme: light;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      padding: 40px 18px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      color: var(--ink);
+      background: linear-gradient(145deg, #f7f9f9 0%, #eef3f4 100%);
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    button, input { font: inherit; }
+    [hidden] { display: none !important; }
+
+    .calculator {
+      width: min(820px, 100%);
+      overflow: hidden;
+      border: 1px solid #d4dfe3;
+      border-radius: 18px;
+      background: var(--surface);
+      box-shadow: 0 18px 50px rgba(35, 62, 76, 0.10);
+    }
+
+    .header {
+      padding: 28px 32px 22px;
+      border-bottom: 2px solid var(--primary-light);
+    }
+
+    .header-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--primary);
+      font-size: 27px;
+      line-height: 1.2;
+      letter-spacing: -0.025em;
+    }
+
+    .subtitle {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .badge {
+      flex: 0 0 auto;
+      padding: 6px 9px;
+      color: #397c72;
+      border: 1px solid #bcded7;
+      border-radius: 6px;
+      background: var(--accent-light);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .content { padding: 25px 32px 30px; }
+
+    .mode-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+      margin-bottom: 18px;
+      padding: 4px;
+      border-radius: 9px;
+      background: var(--primary-light);
+    }
+
+    .mode-tabs label { position: relative; cursor: pointer; }
+    .mode-tabs input { position: absolute; opacity: 0; pointer-events: none; }
+    .mode-tabs span {
+      min-height: 40px;
+      display: grid;
+      place-items: center;
+      padding: 7px 12px;
+      color: var(--primary);
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+    }
+    .mode-tabs input:checked + span {
+      color: var(--primary-dark);
+      background: #fff;
+      box-shadow: 0 2px 7px rgba(29, 68, 92, .10);
+    }
+    .mode-tabs input:focus-visible + span { outline: 3px solid rgba(36, 79, 112, .20); }
+
+    .formula-box {
+      margin-bottom: 23px;
+      padding: 13px 16px;
+      color: var(--primary);
+      border-left: 4px solid var(--primary);
+      border-radius: 5px;
+      background: var(--primary-light);
+      font-family: "Courier New", monospace;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .field.full { grid-column: 1 / -1; }
+    .label-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 7px;
+    }
+    label { color: var(--ink); font-size: 13px; font-weight: 700; }
+    label small { margin-left: 4px; color: var(--muted); font-size: 10px; letter-spacing: .04em; }
+    .unit { color: var(--muted); font-size: 10px; white-space: nowrap; }
+
+    .field input {
+      width: 100%;
+      height: 46px;
+      padding: 0 13px;
+      color: var(--ink);
+      border: 1px solid #bfcdd3;
+      border-radius: 8px;
+      outline: none;
+      background: #fff;
+      font-variant-numeric: tabular-nums;
+    }
+    .field input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(36, 79, 112, .11);
+    }
+    .field input[aria-invalid="true"] { border-color: var(--danger); }
+    .error { min-height: 15px; margin: 4px 0 0; color: var(--danger); font-size: 10px; }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 22px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+    }
+    button {
+      min-height: 43px;
+      padding: 9px 19px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    button:focus-visible, summary:focus-visible { outline: 3px solid rgba(36, 79, 112, .22); outline-offset: 2px; }
+    .reset { color: var(--ink); border-color: #c7d3d8; background: #fff; }
+    .calculate { min-width: 150px; color: #fff; background: var(--primary); }
+    .calculate:hover { background: var(--primary-dark); }
+
+    .result {
+      margin-top: 25px;
+      overflow: hidden;
+      border: 1px solid #cfdce1;
+      border-radius: 12px;
+      background: #f9fbfb;
+    }
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    .result-item { padding: 21px 23px; }
+    .result-item:first-child { border-right: 1px solid #d6e0e4; }
+    .result-label {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .result-value {
+      color: var(--primary);
+      font-size: 35px;
+      font-weight: 700;
+      letter-spacing: -.04em;
+      line-height: 1.05;
+      font-variant-numeric: tabular-nums;
+    }
+    .result-value.quartile { color: var(--accent); }
+    .result-unit { margin-left: 5px; color: var(--muted); font-size: 10px; }
+    .result-detail { display: block; margin-top: 6px; color: var(--muted); font-size: 11px; }
+
+    .ratio-row {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      padding: 11px 23px;
+      border-top: 1px solid var(--line);
+      background: #fff;
+      font-size: 11px;
+    }
+    .ratio-row span { color: var(--muted); }
+    .ratio-row strong { margin-left: 5px; color: var(--ink); font-variant-numeric: tabular-nums; }
+    .ratio-row em { margin-left: auto; color: var(--muted); font-size: 10px; font-style: normal; }
+
+    .result-note {
+      margin: 0;
+      padding: 12px 23px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      background: var(--primary-light);
+      font-size: 11px;
+    }
+
+    .warning {
+      margin-top: 12px;
+      padding: 10px 13px;
+      color: #725523;
+      border: 1px solid var(--warning-line);
+      border-radius: 8px;
+      background: var(--warning-bg);
+      font-size: 10px;
+    }
+    .warning ul { margin: 4px 0 0; padding-left: 17px; }
+
+    details {
+      margin-top: 18px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #fff;
+    }
+    summary {
+      padding: 12px 15px;
+      cursor: pointer;
+      color: var(--primary);
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .details-body { padding: 0 15px 15px; }
+    table { width: 100%; border-collapse: collapse; font-size: 10px; font-variant-numeric: tabular-nums; }
+    th, td { padding: 7px 8px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+    th:first-child, td:first-child { text-align: left; }
+    thead th { color: var(--muted); background: #f6f8f8; }
+    .cutpoints { margin: 10px 0 0; color: var(--muted); font-size: 10px; line-height: 1.65; }
+
+    .footer {
+      padding: 14px 32px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      background: #fafcfc;
+      font-size: 10px;
+      text-align: center;
+    }
+
+    @media (max-width: 620px) {
+      body { padding: 14px 10px; }
+      .calculator { border-radius: 13px; }
+      .header, .content { padding-left: 19px; padding-right: 19px; }
+      .header-top { flex-direction: column; gap: 10px; }
+      h1 { font-size: 23px; }
+      .form-grid, .result-grid { grid-template-columns: 1fr; }
+      .field.full { grid-column: auto; }
+      .result-item:first-child { border-right: 0; border-bottom: 1px solid #d6e0e4; }
+      .ratio-row { flex-wrap: wrap; gap: 8px 18px; }
+      .ratio-row em { width: 100%; margin-left: 0; }
+      .actions { display: grid; grid-template-columns: .8fr 1.2fr; }
+      button { padding-left: 10px; padding-right: 10px; }
+      .details-body { overflow-x: auto; }
+    }
+
+    @media print {
+      body { padding: 0; background: #fff; }
+      .calculator { width: 100%; border: 0; box-shadow: none; }
+      .mode-tabs, .actions, details { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="calculator">
+    <header class="header">
+      <div class="header-top">
+        <div>
+          <h1>BBIS Research Calculator</h1>
+          <p class="subtitle">Blood-based inflammatory score · Model BBIS-UKB-1.0</p>
+        </div>
+        <span class="badge">Research use only</span>
+      </div>
+    </header>
+
+    <section class="content">
+      <fieldset class="mode-tabs" aria-label="Input format">
+        <label><input type="radio" name="mode" value="raw" checked><span>Raw measurements</span></label>
+        <label><input type="radio" name="mode" value="ratios"><span>Pre-calculated ratios</span></label>
+      </fieldset>
+
+      <div class="formula-box">
+        BBIS = standardize[0.0711·Mono<sub>z</sub> + 0.0527·CRP<sub>z</sub> + 0.0353·NEU<sub>z</sub> + 0.2031·NLR<sub>z</sub> − 0.0953·PLR<sub>z</sub>]
+      </div>
+
+      <form id="calculator-form" novalidate>
+        <div class="form-grid">
+          <div class="field">
+            <div class="label-row"><label for="mono">Monocyte count <small>Mono</small></label><span class="unit">10<sup>9</sup>/L</span></div>
+            <input id="mono" name="mono" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 0.45" aria-describedby="mono-error">
+            <p class="error" id="mono-error"></p>
+          </div>
+
+          <div class="field">
+            <div class="label-row"><label for="crp">C-reactive protein <small>CRP</small></label><span class="unit">mg/L</span></div>
+            <input id="crp" name="crp" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 1.20" aria-describedby="crp-error">
+            <p class="error" id="crp-error"></p>
+          </div>
+
+          <div class="field">
+            <div class="label-row"><label for="neu">Neutrophil count <small>NEU</small></label><span class="unit">10<sup>9</sup>/L</span></div>
+            <input id="neu" name="neu" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 4.00" aria-describedby="neu-error">
+            <p class="error" id="neu-error"></p>
+          </div>
+
+          <div class="field raw-field">
+            <div class="label-row"><label for="lym">Lymphocyte count <small>LYM</small></label><span class="unit">10<sup>9</sup>/L</span></div>
+            <input id="lym" name="lym" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 1.80" aria-describedby="lym-error">
+            <p class="error" id="lym-error"></p>
+          </div>
+
+          <div class="field raw-field full">
+            <div class="label-row"><label for="plt">Platelet count <small>PLT</small></label><span class="unit">10<sup>9</sup>/L</span></div>
+            <input id="plt" name="plt" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 240" aria-describedby="plt-error">
+            <p class="error" id="plt-error"></p>
+          </div>
+
+          <div class="field ratio-field" hidden>
+            <div class="label-row"><label for="nlr">Neutrophil-to-lymphocyte ratio <small>NLR</small></label><span class="unit">ratio</span></div>
+            <input id="nlr" name="nlr" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 2.22" aria-describedby="nlr-error" disabled>
+            <p class="error" id="nlr-error"></p>
+          </div>
+
+          <div class="field ratio-field" hidden>
+            <div class="label-row"><label for="plr">Platelet-to-lymphocyte ratio <small>PLR</small></label><span class="unit">ratio</span></div>
+            <input id="plr" name="plr" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 133.33" aria-describedby="plr-error" disabled>
+            <p class="error" id="plr-error"></p>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="reset" class="reset">Reset</button>
+          <button type="submit" class="calculate">Calculate BBIS</button>
+        </div>
+      </form>
+
+      <section class="result" aria-label="Calculated result" aria-live="polite">
+        <div class="result-grid">
+          <div class="result-item">
+            <span class="result-label">Standardized BBIS</span>
+            <strong class="result-value" id="score">--</strong><span class="result-unit">SD units</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">UKB reference quartile</span>
+            <strong class="result-value quartile" id="quartile">--</strong>
+            <span class="result-detail" id="interval">Enter all measurements</span>
+          </div>
+        </div>
+        <div class="ratio-row" id="ratio-row" hidden>
+          <span>NLR <strong id="nlr-result">--</strong></span>
+          <span>PLR <strong id="plr-result">--</strong></span>
+          <em id="ratio-source"></em>
+        </div>
+        <p class="result-note">Quartiles use fixed UK Biobank cut points and are not clinical risk categories.</p>
+      </section>
+
+      <div class="warning" id="warning" hidden><strong>Reference-range note</strong><ul id="warning-list"></ul></div>
+
+      <details>
+        <summary>Exact transformations, constants, and cut points</summary>
+        <div class="details-body">
+          <table>
+            <thead><tr><th>Marker</th><th>Transform</th><th>Center</th><th>Scale</th><th>Weight</th></tr></thead>
+            <tbody>
+              <tr><th>Mono</th><td>Identity</td><td>0.470117</td><td>0.203033</td><td>0.071114</td></tr>
+              <tr><th>CRP</th><td>ln(1+x)</td><td>0.961543</td><td>0.637122</td><td>0.052730</td></tr>
+              <tr><th>NEU</th><td>Identity</td><td>4.162846</td><td>1.369697</td><td>0.035322</td></tr>
+              <tr><th>NLR</th><td>ln(1+x)</td><td>1.163471</td><td>0.277901</td><td>0.203077</td></tr>
+              <tr><th>PLR</th><td>ln(1+x)</td><td>4.901439</td><td>0.363005</td><td>−0.095324</td></tr>
+            </tbody>
+          </table>
+          <p class="cutpoints">Final BBIS = raw weighted score ÷ 0.2345199636.<br>Q1 &lt; −0.676; Q2 = −0.676 to &lt; −0.080; Q3 = −0.080 to &lt; 0.578; Q4 ≥ 0.578.</p>
+        </div>
+      </details>
+    </section>
+
+    <footer class="footer">All calculations are performed locally in this file. No data are transmitted or stored.</footer>
+  </main>
+
+  <script type="module">
+const MODEL_VERSION = "BBIS-UKB-1.0";
+
+const QUARTILE_CUTPOINTS = Object.freeze([
+  -0.675689316442886,
+  -0.0797921475707664,
+  0.578125945171303,
+]);
+
+const REFERENCE_RANGES = Object.freeze({
+  mono: Object.freeze({ min: 0.05, max: 2.0, label: "Monocyte count" }),
+  crp: Object.freeze({ min: 0.1, max: 50.61895, label: "C-reactive protein" }),
+  neu: Object.freeze({ min: 0.61105, max: 11.39, label: "Neutrophil count" }),
+  nlr: Object.freeze({ min: 0.25520948655, max: 12.0693831154, label: "NLR" }),
+  plr: Object.freeze({ min: 19.9855877613, max: 534.4750315095, label: "PLR" }),
+});
+
+const MODEL = Object.freeze({
+  mono: Object.freeze({
+    label: "Mono",
+    transform: (value) => value,
+    center: 0.470117171730117,
+    scale: 0.203032775495271,
+    weight: 0.0711141262642788,
+  }),
+  crp: Object.freeze({
+    label: "CRP",
+    transform: Math.log1p,
+    center: 0.96154254923956,
+    scale: 0.637121522469261,
+    weight: 0.0527299900838217,
+  }),
+  neu: Object.freeze({
+    label: "NEU",
+    transform: (value) => value,
+    center: 4.16284621250473,
+    scale: 1.36969696527581,
+    weight: 0.0353216947941643,
+  }),
+  nlr: Object.freeze({
+    label: "NLR",
+    transform: Math.log1p,
+    center: 1.16347140734481,
+    scale: 0.27790079675417,
+    weight: 0.203077444792431,
+  }),
+  plr: Object.freeze({
+    label: "PLR",
+    transform: Math.log1p,
+    center: 4.90143913034273,
+    scale: 0.363005445502475,
+    weight: -0.0953241097026031,
+  }),
+});
+
+const RAW_SCORE_MEAN = -1.4886131452319324e-16;
+const SCORE_SCALING_SD = 0.23451996362187896;
+const MODES = new Set(["raw", "ratios"]);
+
+const FIELD_LABELS = Object.freeze({
+  mono: "Monocyte count",
+  crp: "C-reactive protein",
+  neu: "Neutrophil count",
+  lym: "Lymphocyte count",
+  plt: "Platelet count",
+  nlr: "NLR",
+  plr: "PLR",
+});
+
+const MODE_FIELDS = Object.freeze({
+  raw: Object.freeze(["mono", "crp", "neu", "lym", "plt"]),
+  ratios: Object.freeze(["mono", "crp", "neu", "nlr", "plr"]),
+});
+
+function isBlank(value) {
+  return value === null || value === undefined || String(value).trim() === "";
+}
+
+function ensureMode(mode) {
+  if (!MODES.has(mode)) {
+    throw new TypeError(`Unknown BBIS input mode: ${mode}`);
+  }
+}
+
+function validateInput(input = {}, mode = "raw") {
+  ensureMode(mode);
+  const errors = {};
+  const values = {};
+
+  for (const field of MODE_FIELDS[mode]) {
+    const supplied = input[field];
+    if (isBlank(supplied)) {
+      errors[field] = `${FIELD_LABELS[field]} is required.`;
+      continue;
+    }
+
+    const numeric = Number(supplied);
+    if (!Number.isFinite(numeric)) {
+      errors[field] = `${FIELD_LABELS[field]} must be a finite number.`;
+      continue;
+    }
+
+    if (field === "lym" && numeric <= 0) {
+      errors[field] = "Lymphocyte count must be greater than zero.";
+      continue;
+    }
+
+    if (numeric < 0) {
+      errors[field] = `${FIELD_LABELS[field]} must be zero or greater.`;
+      continue;
+    }
+
+    values[field] = numeric;
+  }
+
+  return {
+    valid: Object.keys(errors).length === 0,
+    errors,
+    values,
+  };
+}
+
+function classifyQuartile(score) {
+  if (!Number.isFinite(score)) {
+    throw new TypeError("BBIS score must be a finite number.");
+  }
+
+  const [q1, q2, q3] = QUARTILE_CUTPOINTS;
+  if (score < q1) {
+    return { quartile: "Q1", interval: `BBIS < ${q1.toFixed(3)}` };
+  }
+  if (score < q2) {
+    return {
+      quartile: "Q2",
+      interval: `${q1.toFixed(3)} ≤ BBIS < ${q2.toFixed(3)}`,
+    };
+  }
+  if (score < q3) {
+    return {
+      quartile: "Q3",
+      interval: `${q2.toFixed(3)} ≤ BBIS < ${q3.toFixed(3)}`,
+    };
+  }
+  return { quartile: "Q4", interval: `BBIS ≥ ${q3.toFixed(3)}` };
+}
+
+function collectWarnings(values) {
+  return Object.entries(REFERENCE_RANGES).flatMap(([marker, range]) => {
+    const value = values[marker];
+    if (value >= range.min && value <= range.max) {
+      return [];
+    }
+    return [
+      {
+        marker,
+        label: range.label,
+        value,
+        min: range.min,
+        max: range.max,
+        message: `${range.label} is outside the central UKB reference range used for this calculator (${range.min.toLocaleString()}–${range.max.toLocaleString()}).`,
+      },
+    ];
+  });
+}
+
+function calculateBBIS(input, mode = "raw") {
+  const validation = validateInput(input, mode);
+  if (!validation.valid) {
+    const error = new TypeError("BBIS inputs are incomplete or invalid.");
+    error.fieldErrors = validation.errors;
+    throw error;
+  }
+
+  const values = { ...validation.values };
+  if (mode === "raw") {
+    values.nlr = values.neu / values.lym;
+    values.plr = values.plt / values.lym;
+  }
+
+  const transformed = {};
+  const zScores = {};
+  const contributions = {};
+
+  for (const [marker, specification] of Object.entries(MODEL)) {
+    transformed[marker] = specification.transform(values[marker]);
+    zScores[marker] =
+      (transformed[marker] - specification.center) / specification.scale;
+    contributions[marker] = zScores[marker] * specification.weight;
+  }
+
+  const rawScore = Object.values(contributions).reduce(
+    (sum, contribution) => sum + contribution,
+    0,
+  );
+  const score = (rawScore - RAW_SCORE_MEAN) / SCORE_SCALING_SD;
+  const classification = classifyQuartile(score);
+
+  return {
+    score,
+    rawScore,
+    quartile: classification.quartile,
+    interval: classification.interval,
+    ratios: { nlr: values.nlr, plr: values.plr },
+    transformed,
+    zScores,
+    contributions,
+    warnings: collectWarnings(values),
+    modelVersion: MODEL_VERSION,
+  };
+}
+
+
+
+    const form = document.querySelector('#calculator-form');
+    const modeInputs = [...document.querySelectorAll('input[name="mode"]')];
+    const rawFields = [...document.querySelectorAll('.raw-field')];
+    const ratioFields = [...document.querySelectorAll('.ratio-field')];
+    const fieldNames = ['mono', 'crp', 'neu', 'lym', 'plt', 'nlr', 'plr'];
+
+    const mode = () => modeInputs.find(input => input.checked).value;
+    const activeNames = () => mode() === 'raw'
+      ? ['mono', 'crp', 'neu', 'lym', 'plt']
+      : ['mono', 'crp', 'neu', 'nlr', 'plr'];
+
+    function toggleGroup(group, visible) {
+      group.forEach(wrapper => {
+        wrapper.hidden = !visible;
+        wrapper.querySelector('input').disabled = !visible;
+      });
+    }
+
+    function clearErrors() {
+      fieldNames.forEach(name => {
+        const input = document.querySelector('#' + name);
+        input.removeAttribute('aria-invalid');
+        document.querySelector('#' + name + '-error').textContent = '';
+      });
+    }
+
+    function syncMode() {
+      const raw = mode() === 'raw';
+      toggleGroup(rawFields, raw);
+      toggleGroup(ratioFields, !raw);
+      clearErrors();
+      clearResult();
+    }
+
+    function collect() {
+      return Object.fromEntries(activeNames().map(name => [name, document.querySelector('#' + name).value]));
+    }
+
+    function formatScore(value) {
+      return value < 0 ? '−' + Math.abs(value).toFixed(2) : value.toFixed(2);
+    }
+
+    function clearResult() {
+      document.querySelector('#score').textContent = '--';
+      document.querySelector('#quartile').textContent = '--';
+      document.querySelector('#interval').textContent = 'Enter all measurements';
+      document.querySelector('#ratio-row').hidden = true;
+      document.querySelector('#warning').hidden = true;
+    }
+
+    function showErrors(errors) {
+      clearErrors();
+      for (const [name, message] of Object.entries(errors)) {
+        document.querySelector('#' + name).setAttribute('aria-invalid', 'true');
+        document.querySelector('#' + name + '-error').textContent = message;
+      }
+      document.querySelector('#' + Object.keys(errors)[0]).focus();
+    }
+
+    function renderWarnings(warnings) {
+      const box = document.querySelector('#warning');
+      const list = document.querySelector('#warning-list');
+      list.replaceChildren();
+      warnings.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item.message;
+        list.append(li);
+      });
+      box.hidden = warnings.length === 0;
+    }
+
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      const values = collect();
+      const validation = validateInput(values, mode());
+      if (!validation.valid) {
+        showErrors(validation.errors);
+        return;
+      }
+      clearErrors();
+      const result = calculateBBIS(values, mode());
+      document.querySelector('#score').textContent = formatScore(result.score);
+      document.querySelector('#quartile').textContent = result.quartile;
+      document.querySelector('#interval').textContent = result.interval;
+      document.querySelector('#nlr-result').textContent = result.ratios.nlr.toFixed(2);
+      document.querySelector('#plr-result').textContent = result.ratios.plr.toFixed(2);
+      document.querySelector('#ratio-source').textContent = mode() === 'raw' ? 'Calculated from NEU, LYM, and PLT' : 'Entered directly';
+      document.querySelector('#ratio-row').hidden = false;
+      renderWarnings(result.warnings);
+    });
+
+    form.addEventListener('reset', () => requestAnimationFrame(() => {
+      modeInputs[0].checked = true;
+      syncMode();
+    }));
+
+    modeInputs.forEach(input => input.addEventListener('change', syncMode));
+    fieldNames.forEach(name => document.querySelector('#' + name).addEventListener('input', () => {
+      document.querySelector('#' + name).removeAttribute('aria-invalid');
+      document.querySelector('#' + name + '-error').textContent = '';
+    }));
+
+    syncMode();
+  </script>
+</body>
+</html>
