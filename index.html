@@ -124,6 +124,65 @@
     }
     .mode-tabs input:focus-visible + span { outline: 3px solid rgba(36, 79, 112, .20); }
 
+    .input-guidance {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 13px;
+      margin-bottom: 18px;
+      padding: 15px 16px;
+      color: #365466;
+      border: 1px solid #cfe0e7;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #f7fbfc 0%, #eef6f8 100%);
+    }
+    .guidance-icon {
+      width: 25px;
+      height: 25px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      border-radius: 50%;
+      background: var(--primary);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .input-guidance strong {
+      display: block;
+      margin: 1px 0 3px;
+      color: var(--primary-dark);
+      font-size: 13px;
+    }
+    .input-guidance p {
+      margin: 0;
+      font-size: 11px;
+      line-height: 1.55;
+    }
+    .mode-guidance {
+      margin-top: 4px !important;
+      color: var(--primary);
+      font-weight: 700;
+    }
+    .processing-flow {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 11px;
+      color: var(--muted);
+      font-size: 10px;
+    }
+    .processing-flow span {
+      padding: 4px 8px;
+      border: 1px solid #d2e1e6;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .82);
+    }
+    .processing-flow b {
+      color: var(--accent);
+      font-size: 12px;
+    }
+
     .formula-box {
       margin-bottom: 23px;
       padding: 13px 16px;
@@ -198,36 +257,103 @@
     .result {
       margin-top: 25px;
       overflow: hidden;
-      border: 1px solid #cfdce1;
-      border-radius: 12px;
-      background: #f9fbfb;
+      border: 1px solid #cad9df;
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 0 12px 28px rgba(35, 62, 76, .08);
+    }
+    .result-heading {
+      min-height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 14px 20px;
+      color: #fff;
+      background: linear-gradient(120deg, var(--primary-dark) 0%, var(--primary) 70%, #2e6c82 100%);
+    }
+    .result-heading span {
+      display: block;
+      color: #c9dce6;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+    }
+    .result-heading strong {
+      display: block;
+      margin-top: 2px;
+      font-size: 16px;
+      letter-spacing: -.01em;
+    }
+    .result-reference {
+      flex: 0 0 auto;
+      padding: 5px 9px;
+      color: #e7f7f3 !important;
+      border: 1px solid rgba(208, 239, 232, .45);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .10);
+      letter-spacing: .04em !important;
     }
     .result-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: #dce6ea;
     }
-    .result-item { padding: 21px 23px; }
-    .result-item:first-child { border-right: 1px solid #d6e0e4; }
+    .result-item {
+      min-height: 144px;
+      padding: 19px 22px 18px;
+      background: #fff;
+    }
+    .result-item.score-card { border-top: 4px solid var(--primary); }
+    .result-item.quartile-card { border-top: 4px solid var(--accent); }
+    .result-item-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
     .result-label {
       display: block;
-      margin-bottom: 5px;
       color: var(--muted);
       font-size: 10px;
       font-weight: 700;
       letter-spacing: .08em;
       text-transform: uppercase;
     }
+    .result-chip {
+      flex: 0 0 auto;
+      padding: 3px 7px;
+      color: var(--primary);
+      border-radius: 999px;
+      background: var(--primary-light);
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    .quartile-card .result-chip {
+      color: #34776e;
+      background: var(--accent-light);
+    }
+    .result-number {
+      display: flex;
+      align-items: baseline;
+      min-height: 55px;
+      margin-top: 8px;
+    }
     .result-value {
       color: var(--primary);
-      font-size: 35px;
+      font-size: 40px;
       font-weight: 700;
       letter-spacing: -.04em;
       line-height: 1.05;
       font-variant-numeric: tabular-nums;
     }
     .result-value.quartile { color: var(--accent); }
-    .result-unit { margin-left: 5px; color: var(--muted); font-size: 10px; }
-    .result-detail { display: block; margin-top: 6px; color: var(--muted); font-size: 11px; }
+    .result-unit { margin-left: 7px; color: var(--muted); font-size: 10px; font-weight: 700; }
+    .result-detail { display: block; color: var(--muted); font-size: 10px; line-height: 1.45; }
 
     .ratio-row {
       display: flex;
@@ -243,12 +369,29 @@
     .ratio-row em { margin-left: auto; color: var(--muted); font-size: 10px; font-style: normal; }
 
     .result-note {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
       margin: 0;
-      padding: 12px 23px;
-      color: var(--muted);
+      padding: 12px 20px;
+      color: #526d7c;
       border-top: 1px solid var(--line);
       background: var(--primary-light);
       font-size: 11px;
+    }
+    .result-note::before {
+      content: "i";
+      width: 17px;
+      height: 17px;
+      flex: 0 0 17px;
+      display: grid;
+      place-items: center;
+      margin-top: 1px;
+      color: #fff;
+      border-radius: 50%;
+      background: var(--primary);
+      font-size: 10px;
+      font-weight: 700;
     }
 
     .warning {
@@ -299,7 +442,11 @@
       h1 { font-size: 23px; }
       .form-grid, .result-grid { grid-template-columns: 1fr; }
       .field.full { grid-column: auto; }
-      .result-item:first-child { border-right: 0; border-bottom: 1px solid #d6e0e4; }
+      .input-guidance { padding: 14px; }
+      .processing-flow b { display: none; }
+      .processing-flow span { width: 100%; border-radius: 6px; }
+      .result-heading { align-items: flex-start; flex-direction: column; gap: 8px; }
+      .result-item { min-height: 132px; }
       .ratio-row { flex-wrap: wrap; gap: 8px 18px; }
       .ratio-row em { width: 100%; margin-left: 0; }
       .actions { display: grid; grid-template-columns: .8fr 1.2fr; }
@@ -332,6 +479,20 @@
         <label><input type="radio" name="mode" value="ratios"><span>Pre-calculated ratios</span></label>
       </fieldset>
 
+      <aside class="input-guidance" aria-label="Input requirements">
+        <span class="guidance-icon" aria-hidden="true">i</span>
+        <div>
+          <strong>Enter original laboratory values</strong>
+          <p>Use the untransformed results reported by the laboratory, in the units displayed below. Do not log-transform, normalize, standardize, or enter z-scores. The calculator performs all required transformations and UKB-based standardization internally.</p>
+          <p class="mode-guidance" id="mode-guidance">NLR and PLR will be calculated automatically from the entered blood cell counts.</p>
+          <div class="processing-flow" aria-label="Calculation sequence">
+            <span>Original measurements</span><b aria-hidden="true">→</b>
+            <span>Internal transformation and UKB standardization</span><b aria-hidden="true">→</b>
+            <span>Standardized BBIS output</span>
+          </div>
+        </div>
+      </aside>
+
       <div class="formula-box">
         BBIS = standardize[0.0711·Mono<sub>z</sub> + 0.0527·CRP<sub>z</sub> + 0.0353·NEU<sub>z</sub> + 0.2031·NLR<sub>z</sub> − 0.0953·PLR<sub>z</sub>]
       </div>
@@ -339,7 +500,7 @@
       <form id="calculator-form" novalidate>
         <div class="form-grid">
           <div class="field">
-            <div class="label-row"><label for="mono">Monocyte count <small>Mono</small></label><span class="unit">10<sup>9</sup>/L</span></div>
+            <div class="label-row"><label for="mono">Monocyte count <small>Mono</small></label><span class="unit">&times;10<sup>9</sup>/L</span></div>
             <input id="mono" name="mono" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 0.45" aria-describedby="mono-error">
             <p class="error" id="mono-error"></p>
           </div>
@@ -351,31 +512,31 @@
           </div>
 
           <div class="field">
-            <div class="label-row"><label for="neu">Neutrophil count <small>NEU</small></label><span class="unit">10<sup>9</sup>/L</span></div>
+            <div class="label-row"><label for="neu">Neutrophil count <small>NEU</small></label><span class="unit">&times;10<sup>9</sup>/L</span></div>
             <input id="neu" name="neu" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 4.00" aria-describedby="neu-error">
             <p class="error" id="neu-error"></p>
           </div>
 
           <div class="field raw-field">
-            <div class="label-row"><label for="lym">Lymphocyte count <small>LYM</small></label><span class="unit">10<sup>9</sup>/L</span></div>
+            <div class="label-row"><label for="lym">Lymphocyte count <small>LYM</small></label><span class="unit">&times;10<sup>9</sup>/L</span></div>
             <input id="lym" name="lym" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 1.80" aria-describedby="lym-error">
             <p class="error" id="lym-error"></p>
           </div>
 
           <div class="field raw-field full">
-            <div class="label-row"><label for="plt">Platelet count <small>PLT</small></label><span class="unit">10<sup>9</sup>/L</span></div>
+            <div class="label-row"><label for="plt">Platelet count <small>PLT</small></label><span class="unit">&times;10<sup>9</sup>/L</span></div>
             <input id="plt" name="plt" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 240" aria-describedby="plt-error">
             <p class="error" id="plt-error"></p>
           </div>
 
           <div class="field ratio-field" hidden>
-            <div class="label-row"><label for="nlr">Neutrophil-to-lymphocyte ratio <small>NLR</small></label><span class="unit">ratio</span></div>
+            <div class="label-row"><label for="nlr">Neutrophil-to-lymphocyte ratio <small>NLR</small></label><span class="unit">unitless</span></div>
             <input id="nlr" name="nlr" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 2.22" aria-describedby="nlr-error" disabled>
             <p class="error" id="nlr-error"></p>
           </div>
 
-          <div class="field ratio-field" hidden>
-            <div class="label-row"><label for="plr">Platelet-to-lymphocyte ratio <small>PLR</small></label><span class="unit">ratio</span></div>
+          <div class="field ratio-field full" hidden>
+            <div class="label-row"><label for="plr">Platelet-to-lymphocyte ratio <small>PLR</small></label><span class="unit">unitless</span></div>
             <input id="plr" name="plr" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 133.33" aria-describedby="plr-error" disabled>
             <p class="error" id="plr-error"></p>
           </div>
@@ -388,14 +549,28 @@
       </form>
 
       <section class="result" aria-label="Calculated result" aria-live="polite">
-        <div class="result-grid">
-          <div class="result-item">
-            <span class="result-label">Standardized BBIS</span>
-            <strong class="result-value" id="score">--</strong><span class="result-unit">SD units</span>
+        <div class="result-heading">
+          <div>
+            <span>Calculated output</span>
+            <strong>BBIS research result</strong>
           </div>
-          <div class="result-item">
-            <span class="result-label">UKB reference quartile</span>
-            <strong class="result-value quartile" id="quartile">--</strong>
+          <span class="result-reference">UKB-derived reference</span>
+        </div>
+        <div class="result-grid">
+          <div class="result-item score-card">
+            <div class="result-item-top">
+              <span class="result-label">Standardized BBIS</span>
+              <span class="result-chip">Primary output</span>
+            </div>
+            <div class="result-number"><strong class="result-value" id="score">--</strong><span class="result-unit">SD units</span></div>
+            <span class="result-detail">Relative to the UKB derivation distribution</span>
+          </div>
+          <div class="result-item quartile-card">
+            <div class="result-item-top">
+              <span class="result-label">UKB reference quartile</span>
+              <span class="result-chip">Reference group</span>
+            </div>
+            <div class="result-number"><strong class="result-value quartile" id="quartile">--</strong></div>
             <span class="result-detail" id="interval">Enter all measurements</span>
           </div>
         </div>
@@ -404,7 +579,7 @@
           <span>PLR <strong id="plr-result">--</strong></span>
           <em id="ratio-source"></em>
         </div>
-        <p class="result-note">Quartiles use fixed UK Biobank cut points and are not clinical risk categories.</p>
+        <p class="result-note">Reference quartiles use fixed UK Biobank cut points. They describe the score distribution and are not clinical risk categories or estimates of absolute dementia risk.</p>
       </section>
 
       <div class="warning" id="warning" hidden><strong>Reference-range note</strong><ul id="warning-list"></ul></div>
@@ -673,6 +848,9 @@ function calculateBBIS(input, mode = "raw") {
       const raw = mode() === 'raw';
       toggleGroup(rawFields, raw);
       toggleGroup(ratioFields, !raw);
+      document.querySelector('#mode-guidance').textContent = raw
+        ? 'NLR and PLR will be calculated automatically from the entered blood cell counts.'
+        : 'Enter the original unitless ratios: NLR = NEU / LYM and PLR = PLT / LYM.';
       clearErrors();
       clearResult();
     }
@@ -688,7 +866,7 @@ function calculateBBIS(input, mode = "raw") {
     function clearResult() {
       document.querySelector('#score').textContent = '--';
       document.querySelector('#quartile').textContent = '--';
-      document.querySelector('#interval').textContent = 'Enter all measurements';
+      document.querySelector('#interval').textContent = 'Complete all required fields';
       document.querySelector('#ratio-row').hidden = true;
       document.querySelector('#warning').hidden = true;
     }
